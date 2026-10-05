@@ -1,0 +1,1563 @@
+{
+  "info": {
+    "name": "Collection Agent and Accountability System API v1.1",
+    "_postman_id": "a98c3e80-7d12-4f3b-b291-collection-agent-crm",
+    "description": "Production REST API for Collection Agent and Accountability System.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "00 - Admin Module (Organization-Wide Control)",
+      "description": "Consolidated organization summary, user governance, audit events, reconciliation, aging, and collection reports with strict ROLES.ADMIN authorization.",
+      "item": [
+        {
+          "name": "GET Organization Summary Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "dashboard"
+              ]
+            },
+            "description": "Consolidates total receivables, aging buckets, verified collections, reconciliation exceptions, branch/supervisor/agent performance, unassigned cases, disputes, and security/audit activity."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Organization Summary Dashboard (Function Alias)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/getAdminDashboard",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "getAdminDashboard"
+              ]
+            },
+            "description": "Dual-route alias for organization dashboard summary."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Admin Users (Search & Filter)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?role_code=FIELD_AGENT&status=1&search=&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "role_code",
+                  "value": "FIELD_AGENT",
+                  "description": "Filter by role (ADMIN, SUPERVISOR, FIELD_AGENT)"
+                },
+                {
+                  "key": "status",
+                  "value": "1",
+                  "description": "Filter by status (1=Active, 0=Inactive, 2=Suspended)"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search name, email, mobile, or employee code"
+                },
+                {
+                  "key": "branch_id",
+                  "value": "",
+                  "description": "Filter by branch UUID"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Page size limit"
+                }
+              ]
+            },
+            "description": "User search and filtering across the organization with server-side pagination."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Admin Users (Function Alias)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/getAllAdminUsers?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "getAllAdminUsers"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Dual-route alias for user search and filtering."
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Authorized User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kavita Rao\",\n  \"email\": \"kavita.supervisor@collectagent.com\",\n  \"mobile\": \"9876543222\",\n  \"password\": \"Password@123\",\n  \"role_code\": \"SUPERVISOR\",\n  \"employee_code\": \"SUP-701\",\n  \"branch_id\": \"{{branchId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ]
+            },
+            "description": "Create an authorized user with supervisor or agent profile within a managed transaction."
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Authorized User (Function Alias)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pooja Nair\",\n  \"email\": \"pooja.agent@collectagent.com\",\n  \"mobile\": \"9876543233\",\n  \"password\": \"Password@123\",\n  \"role_code\": \"FIELD_AGENT\",\n  \"employee_code\": \"AGT-701\",\n  \"branch_id\": \"{{branchId}}\",\n  \"supervisor_id\": \"{{supervisorId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/createAdminUser",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "createAdminUser"
+              ]
+            },
+            "description": "Dual-route alias for user provisioning."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH Update User Status (Activate/Deactivate/Suspend)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{userId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{userId}}",
+                "status"
+              ]
+            },
+            "description": "Update user status: 1 = Active, 0 = Inactive, 2 = Suspended. Session token is revoked upon status update."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH Update User Status (Function Alias)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/updateUserStatus/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "updateUserStatus",
+                "{{userId}}"
+              ]
+            },
+            "description": "Dual-route alias for updating user status."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Admin Branch Management",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/branches?page=1&limit=10&status=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "branches"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "1",
+                  "description": "Filter by active/inactive"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search branch name or code"
+                }
+              ]
+            },
+            "description": "Branch management with operational supervisor and agent counts."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Admin Branch Management (Function Alias)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/getAllAdminBranches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "getAllAdminBranches"
+              ]
+            },
+            "description": "Dual-route alias for branch management."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Admin Area Management",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/areas?page=1&limit=10&branch_id={{branchId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "areas"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "branch_id",
+                  "value": "{{branchId}}",
+                  "description": "Filter by branch"
+                },
+                {
+                  "key": "status",
+                  "value": "1"
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Area management with associated customer portfolio counts and branch links."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Admin Area Management (Function Alias)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/getAllAdminAreas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "getAllAdminAreas"
+              ]
+            },
+            "description": "Dual-route alias for area management."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Audit Event Search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/audit-logs?page=1&limit=20&success=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "audit-logs"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "success",
+                  "value": "0",
+                  "description": "1 for success, 0 for failed login attempts"
+                },
+                {
+                  "key": "identifier",
+                  "value": "",
+                  "description": "Filter by email or mobile"
+                },
+                {
+                  "key": "user_id",
+                  "value": "",
+                  "description": "Filter by user UUID"
+                },
+                {
+                  "key": "startDate",
+                  "value": ""
+                },
+                {
+                  "key": "endDate",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Search security audit events, login attempts, IP addresses, user agents, and security failures."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Audit Event Search (Function Alias)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/getAuditLogs?page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "getAuditLogs"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Dual-route alias for audit event search."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Financial Reconciliation Exceptions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/reconciliation?status=REVERSED",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "reconciliation"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "REVERSED",
+                  "description": "Payment status (REVERSED, PENDING, UNDER_REVIEW)"
+                },
+                {
+                  "key": "branch_id",
+                  "value": ""
+                },
+                {
+                  "key": "startDate",
+                  "value": ""
+                },
+                {
+                  "key": "endDate",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Consolidate financial exceptions, reversed payments, chargebacks, and reconciliation discrepancies."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Financial Reconciliation Exceptions (Function Alias)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/getReconciliationExceptions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "getReconciliationExceptions"
+              ]
+            },
+            "description": "Dual-route alias for financial reconciliation exceptions."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Aging Report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/reports/aging?page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "reports",
+                "aging"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "branch_id",
+                  "value": "",
+                  "description": "Filter by branch UUID"
+                }
+              ]
+            },
+            "description": "Organization-wide aging analysis categorized by 0-30, 31-60, 61-90, 91-120, and 120+ days past due."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Aging Report (Function Alias)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/getAgingReport",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "getAgingReport"
+              ]
+            },
+            "description": "Dual-route alias for aging report."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Collection Performance Report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/reports/collections?page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "reports",
+                "collections"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "branch_id",
+                  "value": "",
+                  "description": "Filter by branch"
+                },
+                {
+                  "key": "agent_id",
+                  "value": "",
+                  "description": "Filter by field agent"
+                },
+                {
+                  "key": "startDate",
+                  "value": ""
+                },
+                {
+                  "key": "endDate",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Evaluate collection performance, targeted vs realized amounts, efficiency rate, and payment mode breakdown."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Collection Performance Report (Function Alias)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/getCollectionPerformanceReport",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "getCollectionPerformanceReport"
+              ]
+            },
+            "description": "Dual-route alias for collection performance report."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "01 - Authentication",
+      "item": [
+        {
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success && res.data && res.data.tokens) {",
+                  "  pm.environment.set('accessToken', res.data.tokens.accessToken);",
+                  "  pm.environment.set('refreshToken', res.data.tokens.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"admin@collectagent.com\",\n  \"password\": \"Admin@SecurePass2026\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Current User Profile (/me)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Logout Session",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Send Email Verification OTP",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/auth/send-email-otp",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "send-email-otp"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Verify Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/verify-email",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "verify-email"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Send Mobile Verification OTP",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/auth/send-mobile-otp",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "send-mobile-otp"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Verify Mobile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/verify-mobile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "verify-mobile"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Branches",
+      "item": [
+        {
+          "name": "Create Branch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"branch_code\": \"BR-MUM-001\",\n  \"branch_name\": \"Mumbai South Branch\",\n  \"address\": \"45 Nariman Point\",\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"pincode\": \"400021\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/branches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "branches"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Branches",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/branches?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "branches"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Users & Profiles",
+      "item": [
+        {
+          "name": "Create Supervisor User (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rahul Sharma\",\n  \"email\": \"rahul.supervisor@collectagent.com\",\n  \"mobile\": \"9811223344\",\n  \"password\": \"Supervisor@2026\",\n  \"role_code\": \"SUPERVISOR\",\n  \"employee_code\": \"SUP-101\",\n  \"joining_date\": \"2026-01-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Field Agent User (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Amit Patel\",\n  \"email\": \"amit.agent@collectagent.com\",\n  \"mobile\": \"9822334455\",\n  \"password\": \"Agent@Pass2026\",\n  \"role_code\": \"FIELD_AGENT\",\n  \"employee_code\": \"AGT-201\",\n  \"joining_date\": \"2026-02-01\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Customers",
+      "item": [
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Vijay Kumar\",\n  \"mobile\": \"9844556677\",\n  \"address_line1\": \"12 MG Road\",\n  \"city\": \"Bangalore\",\n  \"state\": \"Karnataka\",\n  \"pincode\": \"560001\",\n  \"branch_id\": \"c7e2b104-58cc-4372-a567-0e02b2c3d479\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Customers",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/customers?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Collections & Payments",
+      "item": [
+        {
+          "name": "Create Collection Visit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"<CUSTOMER_UUID>\",\n  \"collection_date\": \"2026-09-28\",\n  \"amount_due\": 5000.00,\n  \"remarks\": \"Scheduled loan EMI collection visit\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/collections",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "collections"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Record Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"collection_id\": \"<COLLECTION_UUID>\",\n  \"amount\": 5000.00,\n  \"payment_method\": 1,\n  \"transaction_reference\": \"UPI-REF-20260928-001\",\n  \"notes\": \"Payment via UPI QR code\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Collections Summary",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/collections/summary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "collections",
+                "summary"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Dashboards",
+      "item": [
+        {
+          "name": "Admin Dashboard",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/admin",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "admin"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Supervisor Dashboard",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/supervisor",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "supervisor"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Field Agent Dashboard",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/agent",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "agent"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Master Values (Dynamic Master Data)",
+      "description": "Controlled APIs to dynamically load active master tables without hardcoding.",
+      "item": [
+        {
+          "name": "Get All Active Masters",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/masters",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "masters"
+              ]
+            },
+            "description": "Returns all active branches, areas, payment modes, and organizations in one payload."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active Branches from Table",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/masters/branches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "masters",
+                "branches"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active Areas from Table",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/masters/areas?branch_id={{branchId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "masters",
+                "areas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active Payment Modes from Table",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/masters/payment-modes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "masters",
+                "payment-modes"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "08 - Areas & Payment Modes",
+      "description": "Area hierarchy and payment mode configuration management.",
+      "item": [
+        {
+          "name": "Create Area",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"branch_id\": \"{{branchId}}\",\n  \"code\": \"AREA-KOR-01\",\n  \"name\": \"Koramangala 4th Block\",\n  \"status\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/areas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "areas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Areas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/areas?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "areas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Areas by Branch",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/areas/branch/{{branchId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "areas",
+                "branch",
+                "{{branchId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Payment Mode",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"QR_CODE\",\n  \"name\": \"Dynamic QR Code Payment\",\n  \"status\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payment-modes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment-modes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Payment Modes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/payment-modes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment-modes"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "09 - Promises to Pay (PTP) & Follow-up Tasks",
+      "description": "Customer commitments tracking, scheduled follow-ups, and overdue commitment alerts.",
+      "item": [
+        {
+          "name": "Record Promise to Pay",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"collection_case_id\": \"{{collectionId}}\",\n  \"customer_id\": \"{{customerId}}\",\n  \"promised_amount\": 3500,\n  \"promised_date\": \"2026-10-15\",\n  \"remarks\": \"Customer committed to pay post salary credit\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/promises-to-pay",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "promises-to-pay"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Promises to Pay",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/promises-to-pay?status=OPEN&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "promises-to-pay"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Promise Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"KEPT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/promises-to-pay/{{ptpId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "promises-to-pay",
+                "{{ptpId}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Follow-up Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action_date\": \"2026-10-16\",\n  \"assigned_employee_id\": \"{{userId}}\",\n  \"task_type\": \"CALL\",\n  \"customer_id\": \"{{customerId}}\",\n  \"notes\": \"Follow up on salary clearance\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/follow-up-tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "follow-up-tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Follow-up Tasks",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/follow-up-tasks?completion_status=PENDING&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "follow-up-tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Evaluate Overdue Commitments (Policy Check)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/promises-to-pay/evaluate-commitments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "promises-to-pay",
+                "evaluate-commitments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Overdue Commitment Alerts (Supervisor)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/promises-to-pay/alerts/overdue",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "promises-to-pay",
+                "alerts",
+                "overdue"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10 - Field Visits & Interactions",
+      "description": "Track field interactions, visit outcomes, and follow-up activities.",
+      "item": [
+        {
+          "name": "Record Field Visit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"{{customerId}}\",\n  \"visit_date\": \"2026-10-01T10:30:00Z\",\n  \"visit_outcome\": 1,\n  \"remarks\": \"Customer met in person, agreed to pay on 5th\",\n  \"latitude\": 12.9716,\n  \"longitude\": 77.5946\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/visits",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "visits"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Field Visits",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/visits?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "visits"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Follow-up",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"{{customerId}}\",\n  \"scheduled_at\": \"2026-10-05T11:00:00Z\",\n  \"follow_up_type\": \"VISIT\",\n  \"notes\": \"Follow up for second installment\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/follow-ups",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "follow-ups"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Follow-ups",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/follow-ups?status=PENDING&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "follow-ups"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
